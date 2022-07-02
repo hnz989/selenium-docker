@@ -1,0 +1,31 @@
+version: "3"
+services:
+  hub:
+    image: dosel/zalenium
+    logging:
+      driver: "none"
+    ports:
+      - "4444:4444"
+      - "5555:5555"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+    command: >
+      start --desiredContainers 3
+            --maxDockerSeleniumContainers 3
+            --maxTestSessions 3
+            --videoRecordingEnabled true
+  chrome:
+    image: selenium/node-chrome:3.14
+    #    shm_size: '1gb'
+    depends_on:
+      - hub
+    environment:
+      - HUB_HOST=hub
+    #      - JAVA_OPTS=-Dwebdriver.chrome.whitelistedIps=
+  firefox:
+    image: selenium/node-firefox:3.14
+    depends_on:
+      - hub
+    environment:
+      - HUB_HOST=hub
